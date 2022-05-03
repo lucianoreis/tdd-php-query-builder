@@ -17,6 +17,7 @@ class Executor
      * @var array
      */
     private array $params = [];
+    private $result;
 
     public function __construct(\PDO $connection, $query = null)
     {
@@ -43,12 +44,25 @@ class Executor
     {
         $proccess = $this->connection->prepare($this->query->getSql());
 
-        foreach ($this->params as $param) {
-            $type = gettype($param['value']) == 'string' ? \PDO::PARAM_STR : \PDO::PARAM_INT;
-            $proccess->bindValue($param['bind'], $param['value'], $type);
+        if ($this->params) {
+            foreach ($this->params as $param) {
+                $type = gettype($param['value']) == 'integer' ? \PDO::PARAM_INT : \PDO::PARAM_STR;
+                $proccess->bindValue($param['bind'], $param['value'], $type);
+            }
         }
 
-        $proccess->execute();
-        return $this->connection->lastInsertId();
+        $proccessResult = $proccess->execute();
+        $this->result = $proccess;
+        // return $this->connection->lastInsertId();
+        return $proccessResult;
+    }
+
+    public function getResult()
+    {
+        if (!$this->result) {
+            return null;
+        }
+
+        return $this->result->fetchAll(\PDO::FETCH_ASSOC);
     }
 }
