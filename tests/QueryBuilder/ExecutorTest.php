@@ -75,27 +75,27 @@ class ExecutorTest extends TestCase
         $this->assertEquals(19.99, $products[0]['price']);
     }
 
-    public function testUpdateAndGetASingleProduct()
-    {
-        $queryBuilder = new Update('products', ['name'], ['id' => 1]);
-
-        $executor = $this->executor;
-        $executor->setQuery($queryBuilder);
-        $executor->setParam(':name', 'Produto 1 Editado');
-        $updated = $executor->execute();
-        $this->assertTrue($updated);
-
-        $queryBuilderProduct = (new Select('products'))
-            ->where('id', '=', ':id');
-        $executorResult = new Executor(self::$conn);
-        $executorResult->setQuery($queryBuilderProduct);
-        $executorResult->setParam(':id', 1);
-        $executorResult->execute();
-
-        $products = $executor->getResult();
-
-        $this->assertEquals('Produto 1 Editado', $products[0]['name']);
-    }
+//    public function testUpdateAndGetASingleProduct()
+//    {
+//        $queryBuilder = new Update('products', ['name'], ['id' => 1]);
+//
+//        $executor = $this->executor;
+//        $executor->setQuery($queryBuilder);
+//        $executor->setParam(':name', 'Produto 1 Editado');
+//        $updated = $executor->execute();
+//        $this->assertTrue($updated);
+//
+//        $queryBuilderProduct = (new Select('products'))
+//            ->where('id', '=', ':id');
+//        $executorResult = new Executor(self::$conn);
+//        $executorResult->setQuery($queryBuilderProduct);
+//        $executorResult->setParam(':id', 1);
+//        $executorResult->execute();
+//
+//        $products = $executor->getResult();
+//
+//        $this->assertEquals('Produto 1 Editado', $products[0]['name']);
+//    }
 
     public function testIfDeletedAProductFromDatabase()
     {
