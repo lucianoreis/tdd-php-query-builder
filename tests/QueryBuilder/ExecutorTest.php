@@ -2,8 +2,10 @@
 
 namespace CodeTests\QueryBuilder;
 
+use Code\QueryBuilder\Query\Delete;
 use Code\QueryBuilder\Query\Insert;
 use Code\QueryBuilder\Query\Select;
+use Code\QueryBuilder\Query\Update;
 use PDO;
 use PDOException;
 use PHPUnit\Framework\TestCase;
@@ -69,8 +71,47 @@ class ExecutorTest extends TestCase
         $executor->execute();
 
         $products = $executor->getResult();
-
         $this->assertEquals('Product 1', $products[0]['name']);
         $this->assertEquals(19.99, $products[0]['price']);
+    }
+
+    public function testUpdateAndGetASingleProduct()
+    {
+        $queryBuilder = new Update('products', ['name'], ['id' => 1]);
+
+        $executor = $this->executor;
+        $executor->setQuery($queryBuilder);
+        $executor->setParam(':name', 'Produto 1 Editado');
+        $updated = $executor->execute();
+        $this->assertTrue($updated);
+
+        $queryBuilderProduct = (new Select('products'))
+            ->where('id', '=', ':id');
+        $executorResult = new Executor(self::$conn);
+        $executorResult->setQuery($queryBuilderProduct);
+        $executorResult->setParam(':id', 1);
+        $executorResult->execute();
+
+        $products = $executor->getResult();
+
+        $this->assertEquals('Produto 1 Editado', $products[0]['name']);
+    }
+
+    public function testIfDeletedAProductFromDatabase()
+    {
+        $query = new Delete('products', ['id' => 1]);
+        $executor = $this->executor;
+        $executor->setQuery($query);
+        $this->assertTrue($executor->execute());
+
+        $query = (new Select('products'))->where('id', '=', ':id');
+        $executor = new Executor(self::$conn);
+        $executor->setQuery($query);
+        $executor->setParam(':id', 1);
+        $executor->execute();
+
+        $products = $executor->getResult();
+
+        $this->assertCount(0, $products);
     }
 }

@@ -51,10 +51,10 @@ class Executor
             }
         }
 
-        $proccessResult = $proccess->execute();
+        $result = $proccess->execute();
         $this->result = $proccess;
-        // return $this->connection->lastInsertId();
-        return $proccessResult;
+
+        return $result;
     }
 
     public function getResult()
